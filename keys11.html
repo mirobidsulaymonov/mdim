@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internetda Muomala Madaniyati</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+        :root {
+            --primary: #34495e; --calm: #3498db; --angry: #e74c3c; --neutral: #95a5a6; --bg: #fdfefe;
+            --idea-color: #27ae60; --person-color: #c0392b;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; color: var(--primary); }
+        .header { background: linear-gradient(135deg, var(--primary), #2c3e50); color: white; padding: 30px; text-align: center; border-radius: 0 0 20px 20px; }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 20px; }
+
+        /* UMUMIY KARTALAR */
+        .section-card { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); border-top: 5px solid var(--neutral); }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; font-size: 1.5em; }
+        
+        /* 1. TERMOMETR */
+        .thermo-box { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .comment-card { flex: 1; padding: 20px; border-radius: 10px; background: #f8f9fa; border: 1px solid #ddd; min-width: 300px; }
+        .comment-text { font-style: italic; font-size: 1.1em; margin-bottom: 15px; color: #555; }
+        .slider-container { margin-top: 15px; text-align: center; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .emoji-feedback { font-size: 2em; margin-top: 10px; transition: 0.3s; }
+
+        /* 2. FILTR */
+        .filter-game { text-align: center; background: #fff8e1; padding: 20px; border-radius: 10px; border: 1px dashed #f1c40f; }
+        .sample-text { font-size: 1.3em; font-weight: bold; margin: 20px 0; }
+        .btn-filter { padding: 10px 25px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; margin: 5px; transition: 0.2s; color: white; font-size: 1em; }
+        .btn-idea { background: var(--idea-color); }
+        .btn-person { background: var(--person-color); }
+        .btn-idea:hover, .btn-person:hover { opacity: 0.8; transform: scale(1.05); }
+
+        /* 3. DIPLOMAT */
+        .diplomat-area { background: #e8f6f3; padding: 20px; border-radius: 10px; border-left: 5px solid var(--idea-color); }
+        .toxic-msg { background: #ffdada; padding: 15px; border-radius: 8px; color: #c0392b; font-weight: bold; margin-bottom: 15px; }
+        textarea { width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #bdc3c7; font-family: inherit; margin-bottom: 10px; resize: vertical; box-sizing: border-box; }
+        .btn-convert { background: var(--calm); color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+
+        /* 4. MONITORING */
+        .monitoring-box { text-align: center; }
+        .monitor-btn { background: white; border: 2px solid var(--primary); padding: 10px 20px; margin: 5px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .monitor-btn.active { background: var(--primary); color: white; }
+
+        #finalReport { display: none; margin-top: 20px; padding: 20px; background: #dff9fb; border-radius: 10px; text-align: center; border: 2px solid var(--calm); animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><i class="fas fa-comments"></i> Internetda Muomala</h1>
+    <p>Jahl bilan emas, aql bilan javob beramiz</p>
+</div>
+
+<div class="container">
+
+    <section class="section-card" style="border-top-color: var(--calm);">
+        <h2>1. Hissiyotlar Termometri</h2>
+        <p>Pastdagi izohlarni o'qiganda jahlingiz chiqdimi yoki xotirjammi? Belgilang.</p>
+        
+        <div class="thermo-box">
+            <div class="comment-card">
+                <div class="badge" style="background:#d4edda; color:#155724; padding:5px; border-radius:5px; display:inline-block; margin-bottom:10px;">A Javob (Odobli)</div>
+                <div class="comment-text">"Salom, men sizning fikringizga qo'shilmayman, chunki aslida voqea boshqacha bo'lgan."</div>
+                <hr>
+                <div class="slider-container">
+                    <label>Sizdagi holat:</label><br>
+                    <input type="range" min="0" max="100" value="10" oninput="updateThermo(this, 'resA')">
+                    <div id="resA" class="emoji-feedback">😌 Xotirjam</div>
+                </div>
+            </div>
+
+            <div class="comment-card">
+                <div class="badge" style="background:#f8d7da; color:#721c24; padding:5px; border-radius:5px; display:inline-block; margin-bottom:10px;">B Javob (Qo'pol)</div>
+                <div class="comment-text">"Sen hech narsani bilmaysan, ahmoq! Faqat g'irt yolg'on gapirasan!"</div>
+                <hr>
+                <div class="slider-container">
+                    <label>Sizdagi holat:</label><br>
+                    <input type="range" min="0" max="100" value="80" oninput="updateThermo(this, 'resB')">
+                    <div id="resB" class="emoji-feedback">😡 G'azab</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-card" style="border-top-color: var(--idea-color);">
+        <h2>2. So'zlar Filtri</h2>
+        <p>Bu gapda nima bor? <b>Odamni haqorat qilyaptimi</b> yoki shunchaki <b>Fikr bildiryaptimi?</b></p>
+        
+        <div class="filter-game">
+            <div id="quizText" class="sample-text">"Sening bu gaplaring g'irt bema'ni!"</div>
+            <div>
+                <button class="btn-filter btn-idea" onclick="checkFilter('idea')"><i class="fas fa-lightbulb"></i> FIKRI YOQMADI</button>
+                <button class="btn-filter btn-person" onclick="checkFilter('person')"><i class="fas fa-user-times"></i> SHAXSNI HAQORATLASH</button>
+            </div>
+            <p id="filterResult" style="font-weight:bold; margin-top:10px; min-height:20px;"></p>
+        </div>
+    </section>
+
+    <section class="section-card" style="border-top-color: #f39c12;">
+        <h2>3. Diplomat bo'lamiz</h2>
+        <p>Mana bu qo'pol yozilgan xabarni chiroyli va madaniyatli qilib o'zgartirib bering.</p>
+        
+        <div class="diplomat-area">
+            <label>Yomon xabar:</label>
+            <div class="toxic-msg"><i class="fas fa-exclamation-triangle"></i> "Bu video bir tiyinga qimmat! Muallifni kallasida hech narsa yo'q, vaqtimni o'g'irlading!"</div>
+            
+            <label>Sizning chiroyli javobingiz:</label>
+            <textarea id="diplomatInput" placeholder="Masalan: Menga video unchalik yoqmadi, chunki..."></textarea>
+            <button class="btn-convert" onclick="submitDiplomat()">YUBORISH</button>
+            <p id="dipFeedback" style="color:var(--idea-color); display:none; margin-top:10px;"><b>Barakalla!</b> Siz jahl qilmasdan chiroyli javob berdingiz.</p>
+        </div>
+    </section>
+
+    <section class="section-card" style="border-top-color: var(--primary);">
+        <h2>4. Xulosa</h2>
+        <p>Ushbu mashg'ulotda nimalarni tushundingiz?</p>
+        
+        <div class="monitoring-box">
+            <div class="q-item">
+                <p>Internetda bahslashganda qaysi usul to'g'ri?</p>
+                <button class="monitor-btn" onclick="setMonitor(this, 'Dalil va Aql')">Fikr va Aql bilan yozish</button>
+                <button class="monitor-btn" onclick="setMonitor(this, 'Jahl va Hissiyot')">Jahl va Hissiyot bilan yozish</button>
+            </div>
+        </div>
+        
+        <button onclick="finishLesson()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; margin-top:20px; font-size:1.1em; cursor:pointer;">DARSNI YAKUNLASH</button>
+    </section>
+
+    <div id="finalReport">
+        <h3><i class="fas fa-medal"></i> Natija</h3>
+        <p id="reportText"></p>
+    </div>
+
+</div>
+
+<script>
+    // 1. Termometr Logikasi
+    function updateThermo(input, resId) {
+        const val = input.value;
+        const disp = document.getElementById(resId);
+        
+        if(val < 30) {
+            disp.innerHTML = "😌 Xotirjam";
+            disp.style.color = "var(--calm)";
+        } else if (val < 70) {
+            disp.innerHTML = "😐 Asabiy";
+            disp.style.color = "#f39c12";
+        } else {
+            disp.innerHTML = "😡 G'azab";
+            disp.style.color = "var(--angry)";
+        }
+    }
+
+    // 2. Filter Logikasi (Soddalashtirilgan savollar)
+    let currentQ = 0;
+    const questions = [
+        { text: "Sening bu gaplaring g'irt bema'ni!", type: 'person', feedback: "To'g'ri! Bu yerda odamni haqorat qilyapti." },
+        { text: "Raqamlarda xatolik bor deb o'ylayman.", type: 'idea', feedback: "Barakalla! Bu to'g'ri tanqid." },
+        { text: "Sen o'zi kimsan menga aql o'rgatadigan?", type: 'person', feedback: "To'g'ri, bu gap odamga tegadi." }
+    ];
+
+    function checkFilter(choice) {
+        const q = questions[currentQ];
+        const res = document.getElementById('filterResult');
+        
+        if(choice === q.type) {
+            res.innerHTML = `<span style="color:var(--idea-color)">${q.feedback}</span>`;
+            // Keyingi savolga o'tish
+            currentQ = (currentQ + 1) % questions.length;
+            setTimeout(() => {
+                document.getElementById('quizText').innerText = `"${questions[currentQ].text}"`;
+                res.innerHTML = "";
+            }, 1500);
+        } else {
+            res.innerHTML = `<span style="color:var(--angry)">Xato. Qayta o'ylab ko'ring.</span>`;
+        }
+    }
+
+    // 3. Diplomat Logikasi
+    function submitDiplomat() {
+        const txt = document.getElementById('diplomatInput').value;
+        if(txt.length > 5) {
+            document.getElementById('dipFeedback').style.display = "block";
+        } else {
+            alert("Iltimos, sal uzunroq yozing.");
+        }
+    }
+
+    // 4. Monitoring Logikasi
+    let monitorChoice = "";
+    function setMonitor(btn, val) {
+        document.querySelectorAll('.monitor-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        monitorChoice = val;
+    }
+
+    function finishLesson() {
+        if(monitorChoice === "") {
+            alert("Iltimos, savolga javob bering!");
+            return;
+        }
+        
+        const report = document.getElementById('finalReport');
+        const txt = document.getElementById('reportText');
+        
+        report.style.display = "block";
+        txt.innerHTML = `
+            Siz <b>Termometr</b> mashqida o'z jahlingizni tekshirdingiz,<br>
+            <b>So'zlar filtri</b>da haqoratni ajratdingiz,<br>
+            va <b>Diplomat</b> bo'lib chiroyli javob yozdingiz.<br><br>
+            Sizning tanlovingiz: <b>${monitorChoice}</b>.
+        `;
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fakt yoki Fake? | Swipe O'yini</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        :root {
+            --bg: #f8fafc;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --success: #00c853;
+            --danger: #ff1744;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .card-stack {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            box-sizing: border-box;
+            cursor: grab;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            user-select: none;
+        }
+
+        .swipe-card h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            line-height: 1.4;
+        }
+
+        .swipe-card .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-fake { background: var(--danger); }
+        .btn-fakt { background: var(--success); }
+        .btn:hover { transform: scale(1.1); }
+
+        .hint {
+            margin-top: 20px;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        /* Swipe effektlari */
+        .swiping-left { transform: translateX(-150%) rotate(-20deg) !important; opacity: 0; }
+        .swiping-right { transform: translateX(150%) rotate(20deg) !important; opacity: 0; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="score-board">Ochko: <span id="score">0</span></div>
+    
+    <div class="card-stack" id="cardStack">
+        </div>
+
+    <div class="controls">
+        <button class="btn btn-fake" onclick="swipe('left')"><i class="fas fa-times"></i></button>
+        <button class="btn btn-fakt" onclick="swipe('right')"><i class="fas fa-check"></i></button>
+    </div>
+
+    <p class="hint"><i class="fas fa-info-circle"></i> Chapga (Fake) yoki O'ngga (Fakt) suring</p>
+    <a href="index.html" style="margin-top: 20px; display: block; color: var(--accent); text-decoration: none; font-weight: 600;">Bosh sahifaga qaytish</a>
+</div>
+
+<script>
+   const questions = [
+        { text: "Internetdagi 'https://' bilan boshlanuvchi barcha saytlar 100% xavfsiz hisoblanadi.", isReal: false, icon: "fa-shield-alt" },
+        { text: "Deepfake - bu sun'iy intellekt yordamida inson qiyofasini videoda almashtirish texnologiyasi.", isReal: true, icon: "fa-user-ninja" },
+        { text: "Agar yangilik sarlavhasi o'ta hayratlanarli bo'lsa, bu ko'pincha clickbait (tuzoq) bo'lishi mumkin.", isReal: true, icon: "fa-mouse-pointer" },
+        { text: "Rasmiy tashkilotlar (masalan, banklar) hech qachon Telegram orqali plastik karta parolini so'ramaydi.", isReal: true, icon: "fa-credit-card" },
+        { text: "Clickbait sarlavhalar faqat foydalanuvchini xabardor qilish uchun yaratiladi.", isReal: false, icon: "fa-ad" },
+        { text: "Rasmning haqiqiyligini tekshirish uchun Google Images 'qidiruv' funksiyasidan foydalanish mumkin.", isReal: true, icon: "fa-search" },
+        { text: "Feyk xabarlar odatda odamlarda qo'rquv, g'azab yoki o'ta quvonch hissini uyg'otishga qaratilgan bo'ladi.", isReal: true, icon: "fa-angry" },
+        { text: "Xabarning muallifi ko'rsatilmagan bo'lsa, bu uning 100% ishonchli ekanligini anglatadi.", isReal: false, icon: "fa-user-secret" },
+        { text: "Propaganda - bu odamlar fikrini ma'lum bir maqsad yo'lida boshqarishga urinishdir.", isReal: true, icon: "fa-bullhorn" },
+        { text: "Ochiq Wi-Fi tarmoqlaridan foydalanganda shaxsiy ma'lumotlarni kiritish xavfsiz.", isReal: false, icon: "fa-wifi" },
+        { text: "Sotsial tarmoqlardagi ko'k belgi (verify) xabarning mazmuni doim haqiqat ekanini kafolatlamaydi.", isReal: true, icon: "fa-check-circle" },
+        { text: "Fakt-cheking - bu ma'lumotlarning to'g'riligini bir nechta mustaqil manbalar orqali tekshirish jarayoni.", isReal: true, icon: "fa-spell-check" },
+        { text: "Agar rasmda taniqli shaxs bo'lsa, demak u rasm ostidagi so'zlarni albatta aytgan bo'ladi.", isReal: false, icon: "fa-comment-slash" },
+        { text: "Fishing (Phishing) - bu foydalanuvchini aldab, login va parollarini qo'lga kiritish usuli.", isReal: true, icon: "fa-fish" },
+        { text: "Sarlavhasida 'SHOK', 'TEZKOR', 'DAXSHAT' so'zlari bor xabarlar har doim eng ishonchli xabarlardir.", isReal: false, icon: "fa-exclamation-triangle" }
+    ];
+
+    let score = 0;
+    let currentIdx = 0;
+
+    function createCard(data) {
+        const card = document.createElement('div');
+        card.className = 'swipe-card';
+        card.innerHTML = `
+            <div class="icon"><i class="fas ${data.icon}"></i></div>
+            <h2>${data.text}</h2>
+        `;
+        return card;
+    }
+
+    function loadCard() {
+        const stack = document.getElementById('cardStack');
+        stack.innerHTML = '';
+        if (currentIdx < questions.length) {
+            const card = createCard(questions[currentIdx]);
+            stack.appendChild(card);
+        } else {
+            stack.innerHTML = `
+                <div class="swipe-card">
+                    <i class="fas fa-trophy" style="font-size: 4rem; color: #ff9100;"></i>
+                    <h2>O'yin tugadi!</h2>
+                    <p>Sizning natijangiz: ${score}/${questions.length}</p>
+                    <button onclick="location.reload()" style="padding: 10px 20px; border-radius: 10px; border: none; background: var(--accent); color: white; cursor: pointer;">Qayta boshlash</button>
+                </div>
+            `;
+        }
+    }
+
+    function swipe(direction) {
+        const card = document.querySelector('.swipe-card');
+        if (!card || currentIdx >= questions.length) return;
+
+        const isReal = questions[currentIdx].isReal;
+        
+        if ((direction === 'right' && isReal) || (direction === 'left' && !isReal)) {
+            score++;
+            document.getElementById('score').innerText = score;
+        }
+
+        card.classList.add(direction === 'left' ? 'swiping-left' : 'swiping-right');
+
+        setTimeout(() => {
+            currentIdx++;
+            loadCard();
+        }, 300);
+    }
+
+    // Dastlabki yuklash
+    loadCard();
+</script>
+
+</body>
+</html>

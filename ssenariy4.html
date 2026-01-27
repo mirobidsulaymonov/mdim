@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Media-Tahlil Portali | Mirobid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+        :root {
+            --primary: #1a5276; --accent: #e67e22; --success: #27ae60;
+            --bg: #f0f3f5; --card: #ffffff; --text: #2c3e50; --danger: #e74c3c;
+            --info: #16a085;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-top: 80px; scroll-behavior: smooth; }
+
+        /* NAVIGATSIYA */
+        nav { 
+            background: var(--primary); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 2000; 
+            display: flex; justify-content: center; gap: 12px; box-shadow: 0 3px 15px rgba(0,0,0,0.2); flex-wrap: wrap;
+        }
+        .nav-link { 
+            color: white; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 30px; 
+            font-size: 13px; text-transform: uppercase; transition: 0.3s; background: rgba(255,255,255,0.1);
+        }
+        .nav-link:hover, .home-btn:hover { background: var(--accent); transform: translateY(-2px); }
+        .home-link { background: var(--success) !important; } /* Bosh sahifa tugmasi ajralib turishi uchun */
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .section-card { background: var(--card); border-radius: 15px; padding: 30px; margin-bottom: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h2 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+
+        /* 1. FEED SIMULATOR */
+        .feed-simulator { border: 2px solid #ddd; border-radius: 10px; height: 400px; overflow-y: scroll; padding: 15px; background: #fafafa; }
+        .post { padding: 15px; border-bottom: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; background: white; }
+        .post.trash { border-left: 4px solid var(--danger); }
+        .post.useful { border-left: 4px solid var(--success); }
+
+        /* 2. CONSTRUCTOR */
+        .constructor-box { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        .chip { padding: 8px 18px; background: #eee; border-radius: 20px; cursor: pointer; border: 1px solid #ccc; font-size: 13px; transition: 0.2s; }
+        .chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* 4. DECONSTRUCTION */
+        .decon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
+        .decon-card { background: #f8f9fa; padding: 15px; border-radius: 10px; cursor: help; border: 1px solid #ddd; font-size: 14px; transition: 0.2s; }
+        .decon-card:hover { background: #eef2f7; }
+        
+        .btn-action { padding: 6px 12px; border-radius: 5px; cursor: pointer; border: none; font-size: 12px; margin-top: 8px; color: white; }
+        
+        /* FOOTER HOME BUTTON */
+        .footer-nav { text-align: center; margin-top: 20px; padding-bottom: 40px; }
+        .home-btn-large { 
+            display: inline-block; padding: 15px 40px; background: var(--primary); color: white; 
+            text-decoration: none; border-radius: 50px; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-link home-link"><i class="fas fa-home"></i> Bosh sahifa</a>
+    <a href="#feed-sec" class="nav-link">Lenta</a>
+    <a href="#const-sec" class="nav-link">Konstruktor</a>
+    <a href="#foot-sec" class="nav-link">Xavfsizlik</a>
+    <a href="#decon-sec" class="nav-link">Dekonstruksiya</a>
+</nav>
+
+<div class="container">
+    <header style="text-align:center; margin-bottom:40px;">
+        <h1>Media-tahlil</h1>
+        <p>Ma'lumotlar bilan ishlashning kengaytirilgan tizimi</p>
+    </header>
+
+    <section id="feed-sec" class="section-card">
+        <h2><i class="fas fa-stream"></i> 1. Axborotli saralash</h2>
+        <div class="feed-simulator">
+            <div class="post trash"><strong>🚨 1. FEYK:</strong> Tunda samolyotlar dori sepyapti! <br><button class="btn-action" style="background:var(--danger)" onclick="this.parentElement.remove()">O'chirish</button></div>
+            <div class="post useful"><strong>📚 2. ILM:</strong> AI sohasida yangi kashfiyot. <br><button class="btn-action" style="background:var(--success)" onclick="alert('Saqlandi')">Saqlash</button></div>
+            <div class="post trash"><strong>💰 3. REKLAMA:</strong> 1 soatda boyib ketish siri! <br><button class="btn-action" style="background:var(--danger)" onclick="this.parentElement.remove()">O'chirish</button></div>
+            <div class="post useful"><strong>🏛 4. TARIX:</strong> Samarqand haqida yangi ma'lumotlar. <br><button class="btn-action" style="background:var(--success)" onclick="alert('Saqlandi')">Saqlash</button></div>
+            <div class="post trash"><strong>⚠️ 5. VAHIMA:</strong> Ertaga internet o'char ekan... <br><button class="btn-action" style="background:var(--danger)" onclick="this.parentElement.remove()">O'chirish</button></div>
+            <div class="post useful"><strong>💻 6. TEXNO:</strong> Yangi smartfonlar taqdimoti. <br><button class="btn-action" style="background:var(--success)" onclick="alert('Saqlandi')">Saqlash</button></div>
+            <div class="post trash"><strong>🎁 7. SOVGA:</strong> Bepul iPhone olish uchun bu yerga bosing. <br><button class="btn-action" style="background:var(--danger)" onclick="this.parentElement.remove()">O'chirish</button></div>
+            <div class="post useful"><strong>🌱 8. EKOLOGIYA:</strong> Toshkentda yangi bog'lar barpo etiladi. <br><button class="btn-action" style="background:var(--success)" onclick="alert('Saqlandi')">Saqlash</button></div>
+            <div class="post trash"><strong>🤡 9. MISH-MISH:</strong> Mashhur artist vafot etdi (Yolg'on). <br><button class="btn-action" style="background:var(--danger)" onclick="this.parentElement.remove()">O'chirish</button></div>
+            <div class="post useful"><strong>⚽ 10. SPORT:</strong> O'zbekiston terma jamoasi g'alaba qozondi. <br><button class="btn-action" style="background:var(--success)" onclick="alert('Saqlandi')">Saqlash</button></div>
+        </div>
+    </section>
+
+    <section id="const-sec" class="section-card">
+        <h2><i class="fas fa-tools"></i> 2. Manipulyatsiya konstruktori </h2>
+        <div class="constructor-box">
+            <div class="chip" onclick="toggleChip(this, '🚨 Shoshilinch')">1. Shoshilinch sarlavha</div>
+            <div class="chip" onclick="toggleChip(this, '👤 Anonim manba')">2. Anonim manba</div>
+            <div class="chip" onclick="toggleChip(this, '📸 Foto-montaj')">3. Foto-montaj</div>
+            <div class="chip" onclick="toggleChip(this, '❗ Maksimal tarqating')">4. Emotsional bosim</div>
+            <div class="chip" onclick="toggleChip(this, '📉 Soxta statistika')">5. Soxta statistika</div>
+            <div class="chip" onclick="toggleChip(this, '🗣 Guvohlar aytishicha')">6. Mavhum guvohlar</div>
+            <div class="chip" onclick="toggleChip(this, '🌍 Jahon sog'liqni saqlash')">7. Nufuzli tashkilot nomi</div>
+            <div class="chip" onclick="toggleChip(this, '⏰ Faqat 5 daqiqa qoldi')">8. Vaqt bo'yicha cheklov</div>
+            <div class="chip" onclick="toggleChip(this, '🤐 Yashirin haqiqat')">9. Konspirologiya</div>
+            <div class="chip" onclick="toggleChip(this, '🚩 Clickbait link')">10. Clickbait havola</div>
+        </div>
+        <div id="preview" style="margin-top:20px; padding:15px; border:2px dashed #ccc; text-align:center; border-radius: 10px;">Elementlarni tanlang...</div>
+    </section>
+
+    <section id="foot-sec" class="section-card">
+        <h2><i class="fas fa-shield-alt"></i> 3. Raqamli xavflar</h2>
+        <div style="background:#fdfefe; border:1px solid #ddd; border-radius:10px; padding:15px;">
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>1. Geolokatsiya joylashuv manzilini ko'rsatish</span><span style="color:red">XAVF: 95%</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>2. Telefon raqamini ochiq oydin ko'rsatib qo'yish</span><span style="color:red">XAVF: 80%</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>3. Soddalashtirilgan parollardan foydalanish</span><span style="color:red">XAVF: 70%</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>4. Ijtimoiy muhandislikka moyillik</span><span style="color:orange">XAVF: 50%</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>5. Ikki bosqichli himoyadan foydalanmaslik</span><span style="color:red">XAVF: 85%</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>6. Begona qurilmalardan kirish</span><span style="color:orange">XAVF: 40%</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px;"><span>7. Fishing havolalarga kirish</span><span style="color:red">XAVF: 90%</span></div>
+        </div>
+    </section>
+
+    <section id="decon-sec" class="section-card">
+        <h2><i class="fas fa-microscope"></i> 4. Media-dekonstruksiya </h2>
+        <div class="decon-grid">
+            <div class="decon-card" onclick="alert('Vizual tahlil: Diqqatni jalb qiluvchi elementlar.')"><strong>1. Vizual tahlil</strong></div>
+            <div class="decon-card" onclick="alert('Muallif pozitsiyasi: Subyektiv qarashlar.')"><strong>2. Muallif pozitsiyasi</strong></div>
+            <div class="decon-card" onclick="alert('Yashirin maqsad: Ommaga ta'sir o'tkazish.')"><strong>3. Yashirin maqsad</strong></div>
+            <div class="decon-card" onclick="alert('Iqtisodiy asos: Kontentdan foyda olish.')"><strong>4. Iqtisodiy asos</strong></div>
+            <div class="decon-card" onclick="alert('Fakt vs Fikr: Isbotlanmagan ma\'lumotlar.')"><strong>5. Fakt vs Fikr</strong></div>
+            <div class="decon-card" onclick="alert('Ob\'yektivlik: Bir tomonlama yondashuv.')"><strong>6. Ob'yektivlik darajasi</strong></div>
+            <div class="decon-card" onclick="alert('Vaqtli tahlil: Axborotning eskirganligi.')"><strong>7. Vaqtli tahlil</strong></div>
+            <div class="decon-card" onclick="alert('Madaniy qatlam: Mentalitetga ta\'siri.')"><strong>8. Madaniy qatlam</strong></div>
+        </div>
+    </section>
+
+    <div class="footer-nav">
+        <a href="index.html" class="home-btn-large"><i class="fas fa-arrow-left"></i> BOSH SAHIFAGA QAYTISH</a>
+    </div>
+</div>
+
+<script>
+    let sel = [];
+    function toggleChip(el, txt) {
+        el.classList.toggle('active');
+        if(el.classList.contains('active')) sel.push(txt);
+        else sel = sel.filter(i => i !== txt);
+        document.getElementById('preview').innerText = sel.length ? "Sizning feykingiz tarkibi: " + sel.join(" + ") : "Elementlarni tanlang...";
+    }
+</script>
+
+</body>
+</html>

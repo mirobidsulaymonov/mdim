@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trollar Laboratoriyasi | Media Savodxonlik</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        :root {
+            --dark-bg: #020617;
+            --card-bg: #1e293b;
+            --trol-green: #22c55e;
+            --trol-purple: #a855f7;
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .lab-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 0 60px rgba(168, 85, 247, 0.15);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-home {
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-home:hover { color: var(--trol-purple); }
+
+        .status-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+        }
+
+        .stat { text-align: center; }
+        .stat-val { display: block; font-weight: 800; color: var(--trol-purple); font-size: 1.5rem; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; }
+
+        .scenario-box h2 { font-size: 1.4rem; color: var(--trol-green); margin-bottom: 15px; }
+        .description { font-size: 1rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 30px; }
+
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-card {
+            background: #334155;
+            padding: 18px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid transparent;
+            font-weight: 600;
+        }
+        .option-card:hover {
+            background: #475569;
+            border-color: var(--trol-purple);
+            transform: scale(1.02);
+        }
+
+        #progress-bar {
+            height: 4px;
+            background: #334155;
+            width: 100%;
+            margin-top: 30px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%;
+            background: var(--trol-purple);
+            width: 0%;
+            transition: 0.4s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="lab-container">
+    <div class="header-nav">
+        <a href="index.html" class="btn-home"><i class="fas fa-arrow-left"></i> Bosh sahifaga</a>
+        <span style="font-size: 0.8rem; color: #64748b;">BO'LIM: MANIPULYATSIYA</span>
+    </div>
+
+    <div id="game-view">
+        <div class="status-bar">
+            <div class="stat">
+                <span id="panic" class="stat-val">0%</span>
+                <span class="stat-label">Jamiyatdagi vahima</span>
+            </div>
+            <div class="stat">
+                <span id="reach" class="stat-val">0</span>
+                <span class="stat-label">Qamrov (Reach)</span>
+            </div>
+        </div>
+
+        <div class="scenario-box">
+            <h2 id="scenario-title">Tayyormisiz?</h2>
+            <p id="scenario-desc" class="description">Laboratoriyada yangi feyk-kampaniya yaratamiz.</p>
+            
+            <div id="options" class="options-list"></div>
+        </div>
+
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+</div>
+
+<script>
+    const levels = [
+        {
+            title: "1. Mavzu tanlash",
+            desc: "Odamlar qaysi mavzuda eng tez vahimaga tushishadi?",
+            options: [
+                { text: "Iqtisodiy o'sish prognozlari", reach: 50, panic: 2, feedback: "Juda ilmiy. Odamlar zerikib o'tib ketadi." },
+                { text: "Tez kunda barcha plastik kartalar bloklanishi", reach: 2000, panic: 45, feedback: "Ajoyib! Pul va xavf haqidagi xabar darrov tarqaladi." },
+                { text: "Yangi kutubxona ochilishi", reach: 20, panic: 0, feedback: "Bu ijobiy xabar. Trollerga to'g'ri kelmaydi." }
+            ]
+        },
+        {
+            title: "2. Sarlavha san'ati",
+            desc: "Xabarga qanday sarlavha qo'yamiz?",
+            options: [
+                { text: "Banklar faoliyatidagi texnik o'zgarishlar", reach: 100, panic: 5, feedback: "Odamlar buni o'qimaydi ham." },
+                { text: "DAHSHAT! BUGUN TUNGI 00:00 DAN KEYIN HIKROBLAR O'CHIRILADI!", reach: 5000, panic: 60, feedback: "Katta harflar va 'Dahshat' so'zi - klassika!" }
+            ]
+        },
+        {
+            title: "3. Vizual dalil",
+            desc: "Xabarni ishonarli qilish uchun rasm kerak...",
+            options: [
+                { text: "Rasmiy bank binosi surati", reach: 300, panic: 10, feedback: "E'tiborni tortmaydi." },
+                { text: "Xira, qizil rangli 'Ogohlantirish' belgisi", reach: 3500, panic: 40, feedback: "Xiralik sirli va qo'rqinchli ko'rinadi." }
+            ]
+        },
+        {
+            title: "4. Botlar hujumi",
+            desc: "Xabarni qayerda birinchi bo'lib tarqatamiz?",
+            options: [
+                { text: "Rasmiy gazeta tahririyatiga yuborish", reach: 10, panic: 0, feedback: "Ular darrov feykligini aniqlashadi." },
+                { text: "Minglab Telegram guruhlariga botlar orqali yoyish", reach: 10000, panic: 30, feedback: "Botlar - trollerning eng yaqin do'sti!" }
+            ]
+        },
+        {
+            title: "5. Izohlar (Comments)",
+            desc: "Odamlar ishonishi uchun post ostida nima yozamiz?",
+            options: [
+                { text: "Bu yolg'on, ishonmang!", reach: -500, panic: -10, feedback: "O'z oyog'ingizga bolta urdingiz!" },
+                { text: "Rost ekan! Qo'shnim bankda ishlaydi, u ham tasdiqladi!", reach: 4000, panic: 50, feedback: "Sobiq 'do'stim/qo'shnim' manbasi juda kuchli manipulyatsiya usuli." }
+            ]
+        },
+        {
+            title: "6. Shok terapiya",
+            desc: "Vahimani oshirish uchun yangi 'detal' qo'shamiz:",
+            options: [
+                { text: "Bu xabarni 10 kishiga yubormasangiz, kartangiz kuyadi!", reach: 8000, panic: 25, feedback: "Spam zanjiri ishga tushdi!" },
+                { text: "Batafsil ma'lumot hukumat saytida", reach: 50, panic: -20, feedback: "Odamlar tekshirishni boshlasa, biz yutqazamiz." }
+            ]
+        },
+        {
+            title: "7. Olovga moy sepish",
+            desc: "Mashhur bloger feykingizni 'shunchaki' ulashdi. Nima qilasiz?",
+            options: [
+                { text: "Blogerga rahmat aytib, xatoni tuzatishini so'rash", reach: 100, panic: -30, feedback: "Siz juda insofli ekansiz. Lekin trollersiz-ku!" },
+                { text: "Yangi soxta profillar bilan blogerni qo'llab-quvvatlash", reach: 12000, panic: 40, feedback: "A'lo! Ommaviy qo'llash effekti yaratildi." }
+            ]
+        },
+        {
+            title: "8. Fakt-chekerlarga qarshi",
+            desc: "Fakt-chekerlar xabaringizni yolg'on deyishdi. Javobingiz?",
+            options: [
+                { text: "Ular haqiqatni bizdan yashirishyapti, ular sotilgan!", reach: 6000, panic: 35, feedback: "Konspirologiya! Odamlar 'yashirin fitna'larga ishonishni yaxshi ko'radi." },
+                { text: "Xatoni tan olish", reach: 0, panic: -50, feedback: "O'yin siz uchun tugadi." }
+            ]
+        },
+        {
+            title: "9. Emotsional bosim",
+            desc: "Xabarga bolalar yoki qariyalar haqida yolg'on qo'shing:",
+            options: [
+                { text: "Eng ko'p nafaqaxo'rlar zarar ko'rishi mumkin ekan!", reach: 9000, panic: 50, feedback: "Hissiyotlar mantiqni o'chiradi." },
+                { text: "Statistik ma'lumotlarni yangilash", reach: 100, panic: 5, feedback: "Yana raqamlar? Hech kimga qiziq emas." }
+            ]
+        },
+        {
+            title: "10. Yakuniy zarba",
+            desc: "Kampaniyani tugatish uchun nima deymiz?",
+            options: [
+                { text: "Hali ham kech emas, barcha pullaringizni naqd qilib oling!", reach: 15000, panic: 80, feedback: "Xaos! Maqsadingizga erishdingiz." },
+                { text: "Hammasi hazil edi", reach: 1000, panic: -40, feedback: "Kechikdingiz, hamma vahimada." }
+            ]
+        }
+    ];
+
+    let currentLevel = 0;
+    let totalReach = 0;
+    let totalPanic = 0;
+
+    function loadLevel() {
+        if (currentLevel >= levels.length) {
+            showEnd();
+            return;
+        }
+        
+        const level = levels[currentLevel];
+        document.getElementById('scenario-title').innerText = level.title;
+        document.getElementById('scenario-desc').innerText = level.desc;
+        document.getElementById('progress-fill').style.width = ((currentLevel / levels.length) * 100) + "%";
+        
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        
+        level.options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'option-card';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function selectOption(opt) {
+        totalReach += opt.reach;
+        totalPanic = Math.max(0, Math.min(100, totalPanic + opt.panic));
+        
+        document.getElementById('reach').innerText = totalReach.toLocaleString();
+        document.getElementById('panic').innerText = totalPanic + "%";
+        
+        alert(opt.feedback);
+        currentLevel++;
+        loadLevel();
+    }
+
+    function showEnd() {
+        document.getElementById('progress-fill').style.width = "100%";
+        document.getElementById('game-view').innerHTML = `
+            <div style="text-align:center; padding: 20px;">
+                <i class="fas fa-mask" style="font-size: 5rem; color: var(--trol-purple); margin-bottom: 20px;"></i>
+                <h2 style="color:var(--trol-green)">MISSYA YAKUNLANDI</h2>
+                <p style="margin-bottom:25px;">Siz jami ${totalReach.toLocaleString()} kishini manipulyatsiya qildingiz.</p>
+                <div style="background: #0f172a; padding: 20px; border-radius: 15px; font-size: 0.95rem; line-height: 1.6; text-align: left;">
+                    <strong>Dars:</strong> Ko'rdingizmi, yolg'on xabarlar qanchalik tez va oson tarqalishini? 
+                    Siz foydalangan usullar (qo'rquv, botlar, hissiyotlar) har kuni real dunyoda qo'llaniladi. 
+                    Endi siz ushbu "qurollar"ni bilasiz va ularga aldanmaysiz!
+                </div>
+                <div style="display:flex; gap:10px; margin-top:30px; justify-content:center;">
+                    <button onclick="location.reload()" style="padding: 12px 25px; border-radius: 10px; border:none; background: #334155; color:white; cursor:pointer;">Qayta o'ynash</button>
+                    <a href="index.html" style="padding: 12px 25px; border-radius: 10px; text-decoration:none; background: var(--trol-purple); color:white; font-weight:700;">Bosh sahifaga</a>
+                </div>
+            </div>
+        `;
+    }
+
+    loadLevel();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hayotiy Vaziyatlar (Keyslar) | Mirobid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+        :root {
+            --primary: #1a5276; --accent: #e67e22; --success: #27ae60;
+            --bg: #f0f3f5; --card: #ffffff; --text: #2c3e50; --danger: #e74c3c;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-top: 80px; }
+
+        /* NAVIGATSIYA */
+        nav { 
+            background: var(--primary); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 2000; 
+            display: flex; justify-content: center; gap: 12px; box-shadow: 0 3px 15px rgba(0,0,0,0.2); width: 100%;
+        }
+        .nav-link { 
+            color: white; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 30px; 
+            font-size: 13px; text-transform: uppercase; transition: 0.3s; background: rgba(255,255,255,0.1);
+        }
+        .nav-link:hover { background: var(--accent); }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+
+        .hero-mini { background: linear-gradient(135deg, #2c3e50, #1a5276); color: white; padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
+
+        /* KEYSLAR USLUBI */
+        .case-card { 
+            background: var(--card); border-radius: 20px; padding: 25px; margin-bottom: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--accent);
+        }
+        .case-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; color: var(--primary); }
+        .case-header i { font-size: 24px; }
+        
+        .situation { background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #ddd; font-style: italic; margin-bottom: 20px; }
+
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { 
+            padding: 15px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; 
+            text-align: left; transition: 0.3s; background: white; font-size: 15px;
+        }
+        .option-btn:hover { border-color: var(--primary); background: #f0f7ff; }
+        
+        /* FEEDBACK (NATIJA) */
+        .result { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; }
+        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-link">Bosh sahifa</a>
+    <a href="metodlar.html" class="nav-link">Metodlar</a>
+    <a href="keyslar.html" class="nav-link" style="background: var(--accent);">Vaziyatlar (Keyslar)</a>
+</nav>
+
+<div class="container">
+    <div class="hero-mini">
+        <h1>Kiber-psixologik Vaziyatlar</h1>
+        <p>Internetdagi to'g'ri va xavfsiz munosabat strategiyasini tanlang</p>
+    </div>
+
+    <div class="case-card">
+        <div class="case-header">
+            <i class="fas fa-comment-slash"></i>
+            <h2>Vaziyat №1: Onlayn Trolling</h2>
+        </div>
+        <div class="situation">
+            "Siz o'z rasmingizni ijtimoiy tarmoqqa yukladingiz. Notanish foydalanuvchi rasm ostiga juda qo'pol va haqoratli izoh yozdi."
+        </div>
+        <div class="options">
+            <div class="option-btn" onclick="checkAnswer(this, 1, false, 'Xato! Bu trollarning asosiy maqsadi. Siz javob qaytarsangiz, u yanada ko\'proq haqorat qilishda davom etadi.')">
+                <b>A)</b> Men ham uning rasmiga kirib, undan ham battar haqorat yozaman.
+            </div>
+            <div class="option-btn" onclick="checkAnswer(this, 1, true, 'To\'g\'ri! Eng yaxshi taktika - e\'tibor bermaslik (Ignore). Izohni o\'chirib, foydalanuvchini bloklash sizning ruhiyatingizni asraydi.')">
+                <b>B)</b> Izohni o'chiraman va ushbu profilni bloklab (spam berib) yuboraman.
+            </div>
+        </div>
+        <div id="result-1" class="result"></div>
+    </div>
+
+    <div class="case-card" style="border-top-color: var(--danger);">
+        <div class="case-header" style="color: var(--danger);">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Vaziyat №2: Kiber-tovlamachilik</h2>
+        </div>
+        <div class="situation">
+            "Noma'lum shaxs sizga yozmoqda: 'Menda sening shaxsiy rasmlaring bor. Agar hozir 100 ming so'm tashlamasang, hammasini do'stlaringga tarqataman!'"
+        </div>
+        <div class="options">
+            <div class="option-btn" onclick="checkAnswer(this, 2, false, 'Xato! Pul bersangiz, tovlamachi sizni oson o\'lja deb biladi va yana ko\'proq pul talab qiladi.')">
+                <b>A)</b> Qo'rqqanimdan tezda aytilgan pulni o'tkazib beraman.
+            </div>
+            <div class="option-btn" onclick="checkAnswer(this, 2, true, 'Juda to\'g\'ri! Shantaj - bu jinoyat. Darhol skrinshot oling va kattalarga yoki IIB Kiberxavfsizlik bo\'limiga murojaat qiling.')">
+                <b>B)</b> Pul bermayman, yozishmalarni skrinshot qilib, IIBga yoki ota-onamga xabar beraman.
+            </div>
+        </div>
+        <div id="result-2" class="result"></div>
+    </div>
+
+    <div class="case-card" style="border-top-color: var(--success);">
+        <div class="case-header" style="color: var(--success);">
+            <i class="fas fa-users-slash"></i>
+            <h2>Vaziyat №3: Kiberbulling (Guruhdagi tazyiq)</h2>
+        </div>
+        <div class="situation">
+            "Sinf guruhida hamma bir o'quvchini ustidan kulib, uni masxara qiluvchi stikerlar yasadi va yakunda uni guruhdan chiqarib yubordi."
+        </div>
+        <div class="options">
+            <div class="option-btn" onclick="checkAnswer(this, 3, false, 'Xato! Bu bilan siz ham bulling (tazyiq) ishtirokchisiga aylanasiz. Sukut saqlash ham tazyiqni qo\'llash hisoblanadi.')">
+                <b>A)</b> Men ham ko'pchilikka qo'shilib kulaman va stikerlar yuboraman.
+            </div>
+            <div class="option-btn" onclick="checkAnswer(this, 3, true, 'Ajoyib! Guruhda adolatni tiklashga urinish va jabrlanuvchini qo\'llab-quvvatlash yuqori media-madaniyat belgisidir.')">
+                <b>B)</b> Boshqalarni to'xtatishga harakat qilaman va o'sha o'quvchini alohida yozib qo'llab-quvvatlayman.
+            </div>
+        </div>
+        <div id="result-3" class="result"></div>
+    </div>
+</div>
+
+<script>
+    function checkAnswer(element, caseId, isCorrect, feedback) {
+        // Hamma variantlarni bloklash
+        const options = element.parentElement.querySelectorAll('.option-btn');
+        options.forEach(opt => opt.style.pointerEvents = 'none');
+        
+        const resultDiv = document.getElementById('result-' + caseId);
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result ' + (isCorrect ? 'correct' : 'incorrect');
+        resultDiv.innerHTML = (isCorrect ? '<i class="fas fa-check-circle"></i> ' : '<i class="fas fa-times-circle"></i> ') + feedback;
+        
+        element.style.borderColor = isCorrect ? 'var(--success)' : 'var(--danger)';
+        element.style.background = isCorrect ? '#f0fff4' : '#fff5f5';
+    }
+</script>
+
+</body>
+</html>

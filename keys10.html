@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot-Detektor 3.0 | Kengaytirilgan tahlil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50; --bot: #e74c3c; --real: #27ae60; --bg: #f4f7f6;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        .header { background: linear-gradient(135deg, var(--primary), #34495e); color: white; padding: 40px; text-align: center; }
+        .container { max-width: 1100px; margin: -30px auto 0; padding: 0 20px; }
+
+        .analysis-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #ecf0f1; color: var(--primary); padding: 18px; text-align: left; font-size: 0.9em; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: top; }
+
+        .user-cell { display: flex; align-items: center; gap: 12px; min-width: 180px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #dfe6e9; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #b2bec3; flex-shrink: 0; }
+        .u-name { font-weight: bold; font-size: 0.9em; display: block; color: #2980b9; }
+
+        .comment-text { font-size: 0.95em; color: #555; line-height: 1.5; font-style: italic; background: #fdfdfd; padding: 8px; border-radius: 5px; border-left: 3px solid #ddd; }
+
+        .input-box { width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 6px; font-family: inherit; font-size: 0.85em; transition: 0.3s; }
+        .input-box:focus { border-color: #3498db; outline: none; background: #fff; }
+
+        .status-select { padding: 8px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; }
+        .s-bot { color: var(--bot); border: 1px solid var(--bot); }
+        .s-real { color: var(--real); border: 1px solid var(--real); }
+
+        .monitor-panel { background: white; border-radius: 15px; padding: 30px; margin-top: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 5px solid #3498db; }
+        .btn-report { background: var(--real); color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 25px; box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); }
+
+        #finalResult { display: none; margin-top: 30px; padding: 25px; background: #fff; border-radius: 15px; border: 2px solid var(--real); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><i class="fas fa-shield-alt"></i> Raqamli immunitet monitoringi</h1>
+    <p>Ijtimoiy tarmoq izohlaridagi kognitiv manipulyatsiyani aniqlash laboratoriyasi</p>
+</div>
+
+<div class="container">
+    <div class="analysis-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Foydalanuvchi</th>
+                    <th>Kengaytirilgan izoh mazmuni</th>
+                    <th>Shubhali belgi (Kognitiv tahlil)</th>
+                    <th>Xulosa</th>
+                </tr>
+            </thead>
+            <tbody id="botRows">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="monitor-panel">
+        <h3><i class="fas fa-microscope"></i> Monitoring o'lchovlari</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <label><b>Affektiv reaksiya:</b> Izohlar soni ko'pligi (masalan 1K+) sizda ushbu xabarga nisbatan ishonch uyg'otadimi?</label>
+                <select id="aff_val" class="input-box" style="margin-top:10px;">
+                    <option value="">Tanlang...</option>
+                    <option value="Ishonch uyg'otadi">Ha, ko'pchilik yozgan bo'lsa haqiqatga yaqin</option>
+                    <option value="Shubha uyg'otadi">Yo'q, bu sun'iy ommaviylik bo'lishi mumkin</option>
+                </select>
+            </div>
+            <div>
+                <label><b>Kognitiv filtr:</b> Bot nutqini aniqlashda qaysi "so'z formulasi" sizga eng ko'p yordam berdi?</label>
+                <input type="text" id="kog_val" class="input-box" style="margin-top:10px;" placeholder="Masalan: Haddan tashqari ijobiy sifatlar...">
+            </div>
+        </div>
+        <button class="btn-report" onclick="showFinal()">MONITORING HISOBOTINI GENERATSIYA QILISH</button>
+    </div>
+
+    <div id="finalResult">
+        <h3 style="color: var(--real); text-align: center;"><i class="fas fa-check-circle"></i> Tahlil Yakunlandi</h3>
+        <div id="reportContent"></div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { u: "User_9928", img: "fas fa-user-secret", msg: "Ajoyib imkoniyat! Men kutgan narsa nihoyat chiqdi. Shoshiling, joylar kam qolgan! Men darrov ro'yxatdan o'tdim, sizga ham maslahat beraman, daromad kafolatlangan!" },
+        { u: "Bekzod_Karimov", img: "fas fa-user-tie", msg: "Kuni kecha ushbu xizmatdan foydalanib ko'rdim. To'g'risi, reklamasidagidek emas ekan. Ba'zi kamchiliklari bor, ayniqsa mijozlar bilan muloqot tizimi juda sekin ishlar ekan." },
+        { u: "A.S.88_Crypto", img: "fas fa-robot", msg: "✅ Daromad ✅ Ishonch ✅ Sifat. Bizning jamoaga qo'shiling va kuniga 500$ gacha pul toping. Hech qanday qiyinchiliksiz. Batafsil ma'lumot profilimizdagi telegram silkada!" },
+        { u: "Malika_Designer", img: "fas fa-palette", msg: "Rasmda ranglar biroz bo'rttirilgan shekilli? Men dizayner sifatida ayta olamanki, bu yerda filtr ishlatilgan. Asl holatini ko'rishning iloji bormi?" },
+        { u: "Global_Promotion_24", img: "fas fa-bolt", msg: "SUPER CHEGIRMA!!! Faqat bugun va faqat siz uchun! Bunday narxni boshqa hech qayerdan topa olmaysiz. Hamma sotib olmoqda, siz esa quruq qolishingiz mumkin! 🔥🔥🔥" },
+        { u: "Jasur_77", img: "fas fa-user", msg: "Toshkentda qaysi filialingizda bor bu mahsulot? Kecha Yunusoboddagiga tushuvdim, tugab qolgan deyishdi. Aniq ma'lumot bera olasizlarmi?" },
+        { u: "Winner_Prize_Bot", img: "fas fa-gift", msg: "Tabriklaymiz! Siz tasodifiy tanlov asosida g'olib bo'ldingiz. Sovg'ani rasmiylashtirish uchun pastdagi havola orqali o'ting va shaxsiy ma'lumotlaringizni kiriting. Shoshiling!" },
+        { u: "Umidaxon_Sh", img: "fas fa-user-graduate", msg: "Men bu mavzuda ko'p o'qiganman, lekin bu maqoladagi faktlar biroz shubhali tuyuldi. Manbalar qayerdan olinganini ko'rsatib o'ta olasizmi?" },
+        { u: "Best_Service_Uz", img: "fas fa-star", msg: "Mijozlarimiz bizdan juda mamnun! Bizning xizmat eng zo'ri, eng arzoni va eng ishonchlisi. Siz ham bizni tanlang va baxtli mijozlarimiz qatoridan joy oling!" },
+        { u: "Xayrullo_Aka", img: "fas fa-car", msg: "Narxi qancha? Faqat Toshkentga dostavka bormi yoki viloyatlarga ham chiqarasizlarmi? To'lovni terminal orqali qilsa bo'ladimi?" }
+    ];
+
+    const tbody = document.getElementById('botRows');
+    data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="user-cell">
+                    <div class="avatar"><i class="${item.img}"></i></div>
+                    <span class="u-name">${item.u}</span>
+                </div>
+            </td>
+            <td><div class="comment-text">${item.msg}</div></td>
+            <td><input type="text" class="input-box" id="sign_${index}" placeholder="Nega shubha qildingiz?"></td>
+            <td>
+                <select class="status-select" id="status_${index}" onchange="updateStyle(this)">
+                    <option value="">Tanlang</option>
+                    <option value="BOT" class="s-bot">BOT</option>
+                    <option value="REAL" class="s-real">REAL</option>
+                </select>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    function updateStyle(el) {
+        el.className = 'status-select ' + (el.value === 'BOT' ? 's-bot' : 's-real');
+    }
+
+    function showFinal() {
+        const aff = document.getElementById('aff_val').value;
+        const kog = document.getElementById('kog_val').value;
+        
+        if(!aff || !kog) {
+            alert("Iltimos, monitoring savollarini to'ldiring!");
+            return;
+        }
+
+        let botsFound = 0;
+        data.forEach((_, i) => { if(document.getElementById('status_'+i).value === 'BOT') botsFound++; });
+
+        document.getElementById('finalResult').style.display = 'block';
+        document.getElementById('reportContent').innerHTML = `
+            <p><b>1. Tahlil qilingan ob'ektlar:</b> 10 ta turli xil ijtimoiy izohlar.</p>
+            <p><b>2. Aniqlangan botlar soni:</b> ${botsFound} ta.</p>
+            <p><b>3. O'quvchining affektiv holati:</b> "${aff}" — bu ko'pchilikning fikriga ko'r-ko'rona ergashmaslik darajasini ko'rsatadi.</p>
+            <p><b>4. Kognitiv tahlil usuli:</b> "${kog}"</p>
+            <p style="background: #e8f6ef; padding: 10px; border-radius: 5px;"><b>Ilmiy xulosa:</b> O'quvchi axborotdagi "hissiy qo'zg'atuvchilarni" (shoshiling, daromad kafolatlangan) taniy oldi va ularni mantiqiy filtr (shaxsiy tajriba, savol berish) orqali neytralladi.</p>
+        `;
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

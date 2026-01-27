@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vizual Detektiv | Media-Immunitet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+        :root {
+            --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background-color: var(--bg); color: var(--primary); margin: 0; padding-bottom: 50px; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 40px 20px; text-align: center; clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); }
+        .container { max-width: 900px; margin: -50px auto 0; padding: 20px; }
+
+        .case-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-left: 8px solid var(--accent); }
+        .case-title { font-size: 1.4em; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        
+        .image-placeholder { 
+            width: 100%; height: 350px; background: #eee; border-radius: 15px; margin-bottom: 20px; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+        }
+        .image-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .verdict-btns { display: flex; gap: 15px; margin-bottom: 20px; }
+        .v-btn { flex: 1; padding: 15px; border-radius: 12px; border: 2px solid #ddd; cursor: pointer; font-weight: bold; transition: 0.3s; text-align: center; }
+        .v-btn:hover { background: #f0f0f0; }
+        .v-btn.real-active { background: var(--success); color: white; border-color: var(--success); }
+        .v-btn.fake-active { background: var(--danger); color: white; border-color: var(--danger); }
+
+        .monitoring-box { background: #fdfefe; border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; }
+        .logic-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px; font-family: inherit; box-sizing: border-box; }
+
+        .submit-all { background: var(--primary); color: white; padding: 20px; border: none; border-radius: 50px; width: 100%; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .submit-all:hover { transform: scale(1.02); background: #34495e; }
+
+        #finalReport { display: none; margin-top: 40px; border-top: 5px solid var(--success); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><i class="fas fa-search"></i> Vizual detektiv laboratoriyasi</h1>
+    <p>Raqamli faktlarni tekshirish va kognitiv tahlil</p>
+</div>
+
+<div class="container">
+
+    <div class="case-card">
+        <div class="case-title"><span style="color:var(--accent)">Keys A:</span> Siyosiy Foto-montaj</div>
+        <div class="image-placeholder">
+            <img src="https://i.ytimg.com/vi/CP-S1ZlTV4Q/maxresdefault.jpg "Siyosiy surat">
+            <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.6); color:white; padding:5px 10px; border-radius:5px; font-size:12px;">Namuna tasviri</div>
+        </div>
+        <p><b>Vaziyat:</b> Ijtimoiy tarmoqlarda ikki davlat rahbarining muloqati aks etgan surat tarqaldi.</p>
+        <div class="verdict-btns">
+            <div class="v-btn" onclick="setVerdict(this, 'A', 'Haqiqiy')">HAQIQIY</div>
+            <div class="v-btn" onclick="setVerdict(this, 'A', 'Soxta')">SOXTA (FEYK)</div>
+        </div>
+        <div class="monitoring-box">
+            <label><strong>Monitoring:</strong> Ushbu rasmning soxtaligini isbotlovchi kognitiv dalil (masalan: soya, chekkalar, mantiq):</label>
+            <input type="text" id="logicA" class="logic-input" placeholder="Soya qiyshiq tushgan yoki bu uchrashuv rəsman bo'lmagan...">
+        </div>
+    </div>
+
+    <div class="case-card" style="border-left-color: #f39c12;">
+        <div class="case-title"><span style="color:#f39c12">Keys B:</span> Kontekstdan uzilgan rasm</div>
+        <div class="image-placeholder">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" alt="Tabiiy ofat">
+        </div>
+        <p><b>Vaziyat:</b> "Bugun Toshkentda kuchli to'fon bo'ldi" sarlavhasi bilan ushbu rasm tarqatildi.</p>
+        <div class="verdict-btns">
+            <div class="v-btn" onclick="setVerdict(this, 'B', 'Haqiqiy')">HAQIQIY</div>
+            <div class="v-btn" onclick="setVerdict(this, 'B', 'Soxta')">SOXTA (Eski rasm)</div>
+        </div>
+        <div class="monitoring-box">
+            <label><strong>Monitoring:</strong> Google Image Search orqali tekshirganda nima aniqlandi?</label>
+            <input type="text" id="logicB" class="logic-input" placeholder="Rasm aslida 2018-yil Amerikada olingan...">
+        </div>
+    </div>
+
+    <div class="case-card" style="border-left-color: #9b59b6;">
+        <div class="case-title"><span style="color:#9b59b6">Keys C:</span> AI (Sun'iy intellekt) surati</div>
+        <div class="image-placeholder">
+            <img src="https://img-s3.onedio.com/id-59b7b8bf3f22862a0f1d1ef1/rev-0/raw/s-eec6d99d573a463702698203bb54bcbf972c6951.jpg"AI art">
+        </div>
+        <p><b>Vaziyat:</b> Samaliyotda selfi qilmoqda "qoyilmaqon odam" surati.</p>
+        <div class="verdict-btns">
+            <div class="v-btn" onclick="setVerdict(this, 'C', 'Haqiqiy')">HAQIQIY</div>
+            <div class="v-btn" onclick="setVerdict(this, 'C', 'Soxta')">AI MAHSULOTI</div>
+        </div>
+        <div class="monitoring-box">
+            <label><strong>Monitoring:</strong> AI yaratganini qaysi anatomik xato orqali bildingiz?</label>
+            <input type="text" id="logicC" class="logic-input" placeholder="Bulutlarga etibor......">
+        </div>
+    </div>
+
+    <button class="submit-all" onclick="finishDetective()"><i class="fas fa-file-contract"></i> MONITORING HISOBOTINI YAKUNLASH</button>
+
+    <div id="finalReport" class="case-card">
+        <h2 style="text-align:center; color: var(--success);">Detektiv hisoboti (Natija)</h2>
+        <div id="reportContent"></div>
+        <p style="font-style:italic; font-size:0.9em; margin-top:20px; text-align:center">
+            *Hisobot affektiv hissiyotdan kognitiv tahlilga o'tish darajasini tasdiqlaydi.
+        </p>
+    </div>
+
+</div>
+
+<script>
+    let results = { A: "", B: "", C: "" };
+
+    function setVerdict(btn, key, val) {
+        // Rangni yangilash
+        let parent = btn.parentElement;
+        parent.querySelectorAll('.v-btn').forEach(b => b.classList.remove('real-active', 'fake-active'));
+        
+        if(val.includes('Haqiqiy')) btn.classList.add('real-active');
+        else btn.classList.add('fake-active');
+        
+        results[key] = val;
+    }
+
+    function finishDetective() {
+        const logA = document.getElementById('logicA').value;
+        const logB = document.getElementById('logicB').value;
+        const logC = document.getElementById('logicC').value;
+
+        if(!results.A || !results.B || !results.C || !logA || !logB || !logC) {
+            alert("Iltimos, barcha keyslarni tahlil qiling va kognitiv dalillarni yozing!");
+            return;
+        }
+
+        let html = `
+            <p><strong>Keys A Qarori:</strong> ${results.A} | <b>Dalil:</b> ${logA}</p>
+            <p><strong>Keys B Qarori:</strong> ${results.B} | <b>Dalil:</b> ${logB}</p>
+            <p><strong>Keys C Qarori:</strong> ${results.C} | <b>Dalil:</b> ${logC}</p>
+        `;
+
+        document.getElementById('reportContent').innerHTML = html;
+        document.getElementById('finalReport').style.display = 'block';
+        document.getElementById('finalReport').scrollIntoView({ behavior: 'smooth' });
+        
+        alert("Siz kognitiv filtrdan muvaffaqiyatli o'tdingiz!");
+    }
+</script>
+
+</body>
+</html>

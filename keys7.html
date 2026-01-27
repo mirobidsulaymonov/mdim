@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nega sotib oldim? | Interaktiv Dars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+        :root {
+            --primary: #2c3e50; --accent: #e67e22; --blue: #3498db; --green: #27ae60;
+            --bg: #f4f7f6; --card: #ffffff;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background-color: var(--bg); color: var(--primary); margin: 0; padding-bottom: 50px; scroll-behavior: smooth; }
+        
+        .header { background: linear-gradient(135deg, var(--primary), var(--blue)); color: white; padding: 40px 20px; text-align: center; clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); }
+        .container { max-width: 900px; margin: -50px auto 0; padding: 20px; }
+
+        .step-card { background: var(--card); border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--blue); }
+        .step-num { background: var(--blue); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 15px; }
+        
+        .emotion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 20px; }
+        .emotion-btn { border: 2px solid #eee; border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; transition: 0.3s; background: white; }
+        .emotion-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .emotion-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .logic-input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-top: 10px; font-family: inherit; box-sizing: border-box; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; }
+
+        .btn-submit { background: var(--green); color: white; padding: 15px 30px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px; display: block; width: 100%; transition: 0.3s; }
+        .btn-submit:hover { background: #219150; box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4); }
+
+        /* NATIJALAR SECTION */
+        #resultDisplay { display: none; margin-top: 30px; border-top: 5px solid var(--green); background: #fff; }
+        .result-item { margin-bottom: 15px; padding: 10px; border-bottom: 1px dashed #eee; }
+        .result-label { font-weight: bold; color: var(--blue); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><i class="fas fa-shopping-cart"></i> "Nega sotib oldim?"</h1>
+    <p>Affektiv reaksiya va kognitiv tahlil laboratoriyasi</p>
+</div>
+
+<div class="container">
+
+    <div class="step-card">
+        <div class="step-num">1</div>
+        <h2>Affektiv qo'zg'atuvchi (Hissiyot)</h2>
+        <p>Reklamani ko'rgan zahoti nima his qildingiz? (Birinchi reaksiyangizni belgilang):</p>
+        <div class="emotion-grid" id="emotionGrid">
+            <div class="emotion-btn" onclick="selectEmotion(this, 'Quvonch')"><i class="fas fa-smile fa-2x"></i><br>Quvonch</div>
+            <div class="emotion-btn" onclick="selectEmotion(this, 'Ochlik')"><i class="fas fa-utensils fa-2x"></i><br>Ochlik</div>
+            <div class="emotion-btn" onclick="selectEmotion(this, 'Egalik istagi')"><i class="fas fa-hand-holding-heart fa-2x"></i><br>Egalik qilish</div>
+            <div class="emotion-btn" onclick="selectEmotion(this, 'Havas')"><i class="fas fa-eye fa-2x"></i><br>Havas</div>
+        </div>
+    </div>
+
+    <div class="step-card" style="border-top-color: var(--accent);">
+        <div class="step-num" style="background: var(--accent);">2</div>
+        <h2>Kognitiv filtrlash (Mantiq)</h2>
+        <p>Endi emotsiyalarni chetga surib, savollarga javob bering:</p>
+        <div>
+            <label>Reklama sizga mahsulotnimi yoki "baxtli hayot" obrazinimi sotmoqda?</label>
+            <input type="text" id="logicTahlil1" class="logic-input" placeholder="Sizning tahlilingiz...">
+        </div>
+        <div style="margin-top: 15px;">
+            <label>Mahsulotning tarkibi yoki narxi haqida aniq fakt bormi?</label>
+            <input type="text" id="logicTahlil2" class="logic-input" placeholder="Masalan: Faqat chiroyli tasvir bor, narx yo'q...">
+        </div>
+    </div>
+
+    <div class="step-card" style="border-top-color: var(--primary);">
+        <div class="step-num" style="background: var(--primary);">3</div>
+        <h2>Media-manipulyatsiyani dekonstruksiya qilish</h2>
+        <p>Bloger tavsiyasini "hissiyot" va "fakt"ga ajrating:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Xabar qismi</th>
+                    <th>Affektiv (Hissiyot)</th>
+                    <th>Kognitiv (Mantiq)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Chiroyli qadoq</td>
+                    <td><input type="text" id="table1_aff" class="logic-input" placeholder="Menga yoqdi"></td>
+                    <td><input type="text" id="table1_kog" class="logic-input" placeholder="Sifati noma'lum"></td>
+                </tr>
+                <tr>
+                    <td>Bloger gapi</td>
+                    <td><input type="text" id="table2_aff" class="logic-input" placeholder="Unga ishonaman"></td>
+                    <td><input type="text" id="table2_kog" class="logic-input" placeholder="Bu shunchaki reklama"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="step-card" style="border-top-color: var(--green);">
+        <div class="step-num" style="background: var(--green);">4</div>
+        <h2>Monitoring va Yakuniy xulosa</h2>
+        <p>Monitoring tizimi uchun quyidagi savollarga yakuniy javob bering:</p>
+        <div style="margin-bottom: 15px;">
+            <label><b>1.</b> Ushbu xabarni ko'rganda birinchi nima his qildingiz?</label>
+            <select class="logic-input" id="finalEmotion">
+                <option value="">Tanlang...</option>
+                <option value="Ijobiy (Hayajon, hayrat)">Ijobiy (Hayajon, hayrat)</option>
+                <option value="Neytral (Qiziqish)">Neytral (Qiziqish)</option>
+                <option value="Salbiy (Shubha)">Salbiy (Shubha)</option>
+            </select>
+        </div>
+        <div>
+            <label><b>2.</b> Xabarda keltirilgan faktlar ishonchlimi?</label>
+            <select class="logic-input" id="finalFakt">
+                <option value="">Tanlang...</option>
+                <option value="Ha, dalillar bor">Ha, dalillar bor</option>
+                <option value="Yo'q, faqat hissiyotga asoslangan">Yo'q, faqat hissiyotga asoslangan</option>
+                <option value="Qisman ishonchli">Qisman ishonchli</option>
+            </select>
+        </div>
+        <button class="btn-submit" onclick="submitData()">NATIJALARNI KO'RISH VA MONITORING</button>
+    </div>
+
+    <div id="resultDisplay" class="step-card">
+        <h2 style="color: var(--green);"><i class="fas fa-poll"></i> Shaxsiy Tahlil Natijalari</h2>
+        <div id="resultContent"></div>
+        <button class="btn-submit" style="background: var(--blue);" onclick="window.print()">HISOBOTNI YUKLAB OLISH (PDF)</button>
+    </div>
+
+</div>
+
+<script>
+    let currentSelectedEmotion = "Tanlanmagan";
+
+    function selectEmotion(btn, text) {
+        let buttons = document.querySelectorAll('.emotion-btn');
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSelectedEmotion = text;
+    }
+
+    function submitData() {
+        // Natijalarni yig'ish
+        const tahlil1 = document.getElementById('logicTahlil1').value;
+        const tahlil2 = document.getElementById('logicTahlil2').value;
+        const tab1_a = document.getElementById('table1_aff').value;
+        const tab1_k = document.getElementById('table1_kog').value;
+        const tab2_a = document.getElementById('table2_aff').value;
+        const tab2_k = document.getElementById('table2_kog').value;
+        const finEm = document.getElementById('finalEmotion').value;
+        const finFakt = document.getElementById('finalFakt').value;
+
+        // Natija oynasini shakllantirish
+        const resultContent = `
+            <div class="result-item"><span class="result-label">Birlamchi hissiy reaksiya:</span> ${currentSelectedEmotion}</div>
+            <div class="result-item"><span class="result-label">Mantiqiy tahlil (Obraz/Mahsulot):</span> ${tahlil1 || 'Kiritilmadi'}</div>
+            <div class="result-item"><span class="result-label">Faktlar mavjudligi:</span> ${tahlil2 || 'Kiritilmadi'}</div>
+            <div class="result-item">
+                <span class="result-label">Dekonstruksiya tahlili:</span><br>
+                - Qadoq: Hissiyot (${tab1_a || '?'}) / Mantiq (${tab1_k || '?'})<br>
+                - Bloger: Hissiyot (${tab2_a || '?'}) / Mantiq (${tab2_k || '?'})
+            </div>
+            <div class="result-item"><span class="result-label">Monitoring - Hissiyot darajasi:</span> ${finEm || 'Tanlanmadi'}</div>
+            <div class="result-item"><span class="result-label">Monitoring - Faktlarga ishonch:</span> ${finFakt || 'Tanlanmadi'}</div>
+            <p style="color: var(--green); font-weight: bold; margin-top: 20px;">Xulosa: Siz affektiv qo'zg'atuvchini kognitiv filtr orqali tahlil qildingiz!</p>
+        `;
+
+        document.getElementById('resultContent').innerHTML = resultContent;
+        document.getElementById('resultDisplay').style.display = 'block';
+        
+        // Sahifani natijaga qarab siljitish
+        document.getElementById('resultDisplay').scrollIntoView({ behavior: 'smooth' });
+        
+        alert("Ma'lumotlar saqlandi va monitoring hisoboti tayyorlandi!");
+    }
+</script>
+
+</body>
+</html>

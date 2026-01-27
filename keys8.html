@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maktab Xabarlari Tahlili | Rangli Marker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+        :root {
+            --primary: #2c3e50; --danger: #e74c3c; --success: #27ae60; --bg: #f4f7f6;
+        }
+        body { font-family: 'Ubuntu', sans-serif; background-color: var(--bg); padding-bottom: 50px; }
+        .container { max-width: 800px; margin: 30px auto; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        .header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 25px; padding-bottom: 10px; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9em; border-left: 5px solid #2196f3; }
+
+        .toolbar { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; position: sticky; top: 10px; z-index: 100; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .marker { padding: 10px 25px; border-radius: 30px; cursor: pointer; border: 3px solid transparent; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .marker-red { background: #ffdada; color: var(--danger); }
+        .marker-green { background: #d4edda; color: var(--success); }
+        .marker.active { border-color: var(--primary); transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .text-area { 
+            line-height: 2.5; font-size: 1.3em; padding: 25px; border: 2px solid #eee; border-radius: 15px; 
+            min-height: 200px; cursor: pointer; text-align: justify; background: #fff;
+        }
+        .w { cursor: pointer; transition: 0.1s; padding: 3px 6px; border-radius: 6px; display: inline-block; }
+        .w:hover { background: #f0f0f0; }
+        .h-red { background-color: var(--danger) !important; color: white !important; }
+        .h-green { background-color: var(--success) !important; color: white !important; }
+
+        .result-box { display: none; margin-top: 30px; padding: 25px; border-radius: 15px; text-align: center; border: 2px solid #eee; }
+        .stat-bar { display: flex; height: 35px; border-radius: 20px; overflow: hidden; margin: 20px 0; background: #eee; border: 1px solid #ddd; }
+        .bar-red { background: var(--danger); width: 0%; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bar-green { background: var(--success); width: 0%; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .btn { background: var(--primary); color: white; padding: 15px 30px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%; font-size: 1.1em; transition: 0.3s; }
+        .btn:hover { background: #34495e; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-school"></i> Maktab e'lonlari detektori</h1>
+        <p>Hissiyot va faktlarni ajratishni o'rganamiz</p>
+    </div>
+
+    <div class="instructions">
+        <strong>Vazifa:</strong> Quyidagi xabarni o'qing. <br>
+        🔴 <b>Qizil marker:</b> Bo'rttirilgan, hissiy so'zlar (dahshatli, eng zo'r, hamma shart...). <br>
+        🟢 <b>Yashil marker:</b> Aniq ma'lumotlar (vaqt, xona raqami, sana).
+    </div>
+
+    <div class="toolbar">
+        <div id="mRed" class="marker marker-red" onclick="setMarker('red')"><i class="fas fa-paint-brush"></i> Hissiyot</div>
+        <div id="mGreen" class="marker marker-green" onclick="setMarker('green')"><i class="fas fa-paint-brush"></i> Fakt</div>
+    </div>
+
+    <div id="contentBox" class="text-area">
+        </div>
+
+    <button class="btn" onclick="calculateResult()"><i class="fas fa-check-double"></i> TAHLIL QILISH</button>
+
+    <div id="resultBox" class="result-box">
+        <h2 id="resultTitle"></h2>
+        <div class="stat-bar">
+            <div id="barRed" class="bar-red"></div>
+            <div id="barGreen" class="bar-green"></div>
+        </div>
+        <div id="resNumbers" style="font-weight: bold; margin-bottom: 15px;"></div>
+        <p id="resultDesc" style="line-height: 1.6;"></p>
+        <button class="btn" style="background: #95a5a6;" onclick="location.reload()">Qaytadan boshlash</button>
+    </div>
+</div>
+
+<script>
+    // Maktab mavzusidagi manipulyativ matn
+    const text = "DIQQAT! HAMMA KO'RSIN! Ertaga maktabimizda dahshatli darajada muhim tadbir bo'ladi! Kelmaganlar eng vafosiz o'quvchi hisoblanadi! Tadbir soat 09:00 da faollar zalida boshlanadi. Bizning maktab shahardagi eng zo'r maktab bo'lgani uchun hamma forma kiyishi shart! Kelmasangiz, butun umr afsuslanasiz! Tadbirda 5 ta yo'nalish bo'yicha chiqishlar bo'ladi.";
+
+    let currentMarker = null;
+
+    const box = document.getElementById('contentBox');
+    text.split(' ').forEach(word => {
+        const span = document.createElement('span');
+        span.innerText = word + ' ';
+        span.className = 'w';
+        span.onclick = function() {
+            if (!currentMarker) {
+                alert("Iltimos, avval yuqoridan markerni tanlang!");
+                return;
+            }
+            this.classList.remove('h-red', 'h-green');
+            this.classList.add(currentMarker === 'red' ? 'h-red' : 'h-green');
+        };
+        box.appendChild(span);
+    });
+
+    function setMarker(color) {
+        currentMarker = color;
+        document.querySelectorAll('.marker').forEach(m => m.classList.remove('active'));
+        if(color === 'red') document.getElementById('mRed').classList.add('active');
+        else document.getElementById('mGreen').classList.add('active');
+    }
+
+    function calculateResult() {
+        const redWords = document.querySelectorAll('.h-red').length;
+        const greenWords = document.querySelectorAll('.h-green').length;
+        const total = redWords + greenWords;
+
+        if (total === 0) {
+            alert("Kamida 3-4 ta so'zni belgilang!");
+            return;
+        }
+
+        const resBox = document.getElementById('resultBox');
+        const rPerc = (redWords / total) * 100;
+        const gPerc = (greenWords / total) * 100;
+
+        document.getElementById('barRed').style.width = rPerc + "%";
+        document.getElementById('barGreen').style.width = gPerc + "%";
+        document.getElementById('resNumbers').innerText = `Hissiyot: ${Math.round(rPerc)}% | Faktlar: ${Math.round(gPerc)}%`;
+        resBox.style.display = "block";
+
+        const title = document.getElementById('resultTitle');
+        const desc = document.getElementById('resultDesc');
+
+        if (rPerc > 60) {
+            title.innerText = "🛑 Bu Manipulyatsiya!";
+            title.style.color = "var(--danger)";
+            desc.innerText = "Bu e'lon sizga ma'lumot berishdan ko'ra, qo'rqitish yoki aybdorlik hissini uyg'otishga harakat qilyapti. 'Dahshatli', 'vafosiz', 'afsuslanasiz' kabi so'zlar hissiy bosim o'tkazish uchun ishlatilgan.";
+        } else if (gPerc > 50) {
+            title.innerText = "✅ Bu Aniq Ma'lumot";
+            title.style.color = "var(--success)";
+            desc.innerText = "Xabarda aniq faktlar (vaqt, joy, miqdor) yetarli. Siz hissiyotlarni chetga surib, asosiy mazmunni tushunib oldingiz.";
+        } else {
+            title.innerText = "⚖️ Aralash xabar";
+            title.style.color = "#f39c12";
+            desc.innerText = "Xabarda ham hissiyotlar, ham faktlar bor. Faqat yashil rang bilan belgilangan qismlarga ishoning.";
+        }
+        resBox.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

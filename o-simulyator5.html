@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raqamli Detektiv | OSINT Kvest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quest-card {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border-top: 8px solid var(--primary);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .case-file {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .evidence-img {
+            width: 100%;
+            height: 250px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .evidence-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tool-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--accent);
+            background: #eff6ff;
+            transform: translateY(-3px);
+        }
+
+        .tool-btn i { display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent); }
+
+        .hint-box {
+            background: #fff9db;
+            padding: 15px;
+            border-left: 5px solid #fab005;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .btn-home {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quest-card">
+    <div class="header">
+        <a href="index.html" class="btn-home"><i class="fas fa-home"></i> Bosh sahifa</a>
+        <div id="score" style="font-weight: 800;">Ball: 0</div>
+    </div>
+
+    <div id="game-container">
+        <div class="case-file">
+            <div id="evidence-view" class="evidence-img">
+                <img id="case-image" src="" alt="Dalil" style="display: none;">
+                <i id="case-icon" class="fas fa-search"></i>
+            </div>
+            <h3 id="case-title" style="margin-top:0;">Yuklanmoqda...</h3>
+            <p id="case-desc" style="color: #64748b; font-size: 0.95rem; line-height: 1.5;"></p>
+        </div>
+
+        <div id="hint" class="hint-box"></div>
+
+        <div class="tools-grid" id="tools"></div>
+    </div>
+</div>
+
+<script>
+    const cases = [
+        {
+            title: "Ish #1: G'ayritabiiy tabiat",
+            desc: "Telegramda 'Toshkentda hozirgina qum bo'roni bo'ldi' deb ushbu rasm tarqaldi. Tekshirishni nimadan boshlaysiz?",
+            image: "https://i.ytimg.com/vi/KUo6EcoS6Uw/maxresdefault.jpg", 
+            steps: [
+                { tool: "Google Reverse Image", icon: "fa-camera", correct: true, feedback: "Ball oldingiz! Rasm 2015-yilda Arabistonda olingani ma'lum bo'ldi.", points: 10 },
+                { tool: "Do'stlardan so'rash", icon: "fa-users", correct: false, feedback: "Do'stlaringiz ham adashishi mumkin. Ball berilmadi.", points: 0 }
+            ]
+        },
+        {
+            title: "Ish #2: Bepul sovg'a?",
+            desc: "Sizga 'Telegramdan bepul 50GB sovg'a' degan reklama rasmda ko'rsatilgan havola bilan keldi. Nima qilasiz?",
+            image: "https://avatars.mds.yandex.net/i?id=21d96a32d4f89f402a53577c9674df97e585be80-8182695-images-thumbs&n=13",
+            steps: [
+                { tool: "Havola (URL) tahlili", icon: "fa-link", correct: true, feedback: "Ball oldingiz! Havola 'telegram.org' emas, shubhali 'gift-tele.xyz' ekan.", points: 10 },
+                { tool: "Tezda ulanish", icon: "fa-bolt", correct: false, feedback: "Xato! Bu fishing xabari edi.", points: -5 }
+            ]
+        },
+        {
+            title: "Ish #3: Deepfake tahlili",
+            desc: "Mashhur shaxsning videolaridan olingan ushbu kadrda g'alati narsani sezyapsizmi? Bu rostmi?",
+            image: "https://avatars.mds.yandex.net/i?id=642f92d92948388dfd86bfa4cc123890fde48cf0-10120057-images-thumbs&ref=rim&n=33&w=480&h=270",
+            steps: [
+                { tool: "Metama'lumotlarni ko'rish", icon: "fa-file-code", correct: true, feedback: "Ball oldingiz! Video sun'iy intellekt yordamida yaratilgani aniqlandi.", points: 10 },
+                { tool: "Ovoziga ishonish", icon: "fa-volume-up", correct: false, feedback: "Hozirgi kunda AI ovozni ham o'xshata oladi.", points: 0 }
+            ]
+        },
+        {
+            title: "Ish #4: Soxta profil",
+            desc: "Sizga tanish brend nomidan 'Yutuq yutdingiz' deb yozishdi. Profil rasmi mana bu.",
+            image: "https://i.ytimg.com/vi/e-BcvKAfAAo/maxresdefault.jpg",
+            steps: [
+                { tool: "Verifikatsiya (ko'k belgi)", icon: "fa-check-circle", correct: true, feedback: "Ball oldingiz! Rasmiy kanalda ko'k belgi bo'lishi shart.", points: 10 },
+                { tool: "Ismiga ishonish", icon: "fa-user", correct: false, feedback: "Ismni hamma bir xil qilib yozishi mumkin.", points: -5 }
+            ]
+        },
+        {
+            title: "Ish #5: Eski yangilik",
+            desc: "Internetda 'Maktablarda darslar to'xtatildi' degan xabar tarqaldi. Rasmdagi sanaga qarang.",
+            image: "https://m.aniq.uz/photos/news/4PBeXuONrj5OujS.jpeg",
+            steps: [
+                { tool: "Manba sanasini tekshirish", icon: "fa-calendar-alt", correct: true, feedback: "Ball oldingiz! Bu xabar aslida 2021-yilga tegishli ekan.", points: 10 },
+                { tool: "Xabarni tarqatish", icon: "fa-share-alt", correct: false, feedback: "Eski xabarni tarqatish feyk tarqatish bilan teng.", points: -10 }
+            ]
+        },
+        {
+            title: "Ish #6: Manipulyatsiya",
+            desc: "Rasmning bir qismi qirqib olingan (Crop). To'liq rasmni qanday topasiz?",
+            image: "https://i.ytimg.com/vi/zhPKxzT9qAk/maxresdefault.jpg",
+            steps: [
+                { tool: "TinEye qidiruvi", icon: "fa-search-plus", correct: true, feedback: "Ball oldingiz! To'liq rasmda vaziyat mutlaqo boshqacha ekan.", points: 10 },
+                { tool: "Rasmga shunchaki qarash", icon: "fa-eye", correct: false, feedback: "Rasmning bir qismi haqiqatni yashirishi mumkin.", points: 0 }
+            ]
+        },
+        {
+            title: "Ish #7: Xavfli Wi-Fi",
+            desc: "Aeroportda 'Free_WiFi_Airport' nomli tarmoq chiqdi. Rasmda ko'rsatilgan ogohlantirishga qarang.",
+            image: "https://i.ytimg.com/vi/T7gFfH0-Pd8/maxresdefault.jpg",
+            steps: [
+                { tool: "Xavfsizlik sertifikati", icon: "fa-shield-alt", correct: true, feedback: "Ball oldingiz! Bu tarmoq shaxsiy ma'lumotlarni o'g'irlash uchun ochilgan.", points: 10 },
+                { tool: "Tezda ulanish", icon: "fa-wifi", correct: false, feedback: "Ma'lumotlaringiz xavf ostida qoldi.", points: -15 }
+            ]
+        },
+        {
+            title: "Ish #8: Clickbait san'ati",
+            desc: "'SHOK! Bu mevani yesangiz o'lasiz' degan sarlavhali rasm. Nima qilasiz?",
+            image: "https://i.ytimg.com/vi/rc7yudMRNns/maxresdefault.jpg",
+            steps: [
+                { tool: "Sarlavha va matnni solishtirish", icon: "fa-copy", correct: true, feedback: "Ball oldingiz! Bu shunchaki reklama uchun qilingan clickbait.", points: 10 },
+                { tool: "Qo'rquvga tushish", icon: "fa-flushed", correct: false, feedback: "Clickbait aynan qo'rquv uchun ishlaydi.", points: 0 }
+            ]
+        },
+        {
+            title: "Ish #9: Sun'iy intellekt matni",
+            desc: "Ushbu xabar matnida mantiqiy xatolar bor va gaplar robotga o'xshaydi. Tekshiring.",
+            image: "https://i.ytimg.com/vi/9UDXNzmgWwA/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgQyg4MA8=&rs=AOn4CLBT2AFWYrT6QnNmuwfAs_77lMID9w",
+            steps: [
+                { tool: "AI Detector vositasi", icon: "fa-robot", correct: true, feedback: "Ball oldingiz! Matn ChatGPT tomonidan yozilgani aniqlandi.", points: 10 },
+                { tool: "Xabarni haqiqat deb bilish", icon: "fa-check", correct: false, feedback: "AI noto'g'ri faktlarni ham to'g'ridek yozishi mumkin.", points: -5 }
+            ]
+        },
+        {
+            title: "Ish #10: Geolokatsiya",
+            desc: "Rasmda binolar va ko'cha chiroqlari ko'rinib turibdi. Joyni qayerdan qidirasiz?",
+            image: "https://xs.uz/upload/post/2019/9/14/1/a47ccf81c64478fb9ecfc75fd2769ff10914.jpg",
+            steps: [
+                { tool: "Google Street View", icon: "fa-map-marked-alt", correct: true, feedback: "Ball oldingiz! Binolar orqali rasm Parijda olingani aniqlandi.", points: 10 },
+                { tool: "Taxmin qilish", icon: "fa-question", correct: false, feedback: "Detektivlar taxmin qilmaydi, dalil topadi.", points: 0 }
+            ]
+        }
+    ];
+
+    let currentCase = 0;
+    let totalScore = 0;
+
+    function loadCase() {
+        if (currentCase >= cases.length) {
+            showResult();
+            return;
+        }
+
+        const c = cases[currentCase];
+        document.getElementById('case-title').innerText = c.title;
+        document.getElementById('case-desc').innerText = c.desc;
+        document.getElementById('hint').style.display = 'none';
+
+        const imgElement = document.getElementById('case-image');
+        const iconElement = document.getElementById('case-icon');
+
+        if (c.image && c.image !== "BU_YERGA_RASM_LINKINI_QO'YING") {
+            imgElement.src = c.image;
+            imgElement.style.display = 'block';
+            iconElement.style.display = 'none';
+        } else {
+            imgElement.style.display = 'none';
+            iconElement.style.display = 'block';
+        }
+        
+        const toolsDiv = document.getElementById('tools');
+        toolsDiv.innerHTML = '';
+
+        c.steps.forEach(step => {
+            const btn = document.createElement('div');
+            btn.className = 'tool-btn';
+            btn.innerHTML = `<i class="fas ${step.icon}"></i> ${step.tool}`;
+            btn.onclick = () => handleStep(step);
+            toolsDiv.appendChild(btn);
+        });
+    }
+
+    function handleStep(step) {
+        const hintBox = document.getElementById('hint');
+        hintBox.style.display = 'block';
+        hintBox.innerText = step.feedback;
+        hintBox.style.borderColor = step.correct ? 'var(--success)' : '#ff1744';
+
+        if (step.correct) {
+            totalScore += step.points;
+            document.getElementById('score').innerText = `Ball: ${totalScore}`;
+            setTimeout(() => {
+                currentCase++;
+                loadCase();
+            }, 3000);
+        } else {
+            totalScore += step.points;
+            document.getElementById('score').innerText = `Ball: ${totalScore}`;
+        }
+    }
+
+    function showResult() {
+        document.getElementById('game-container').innerHTML = `
+            <div style="text-align:center; padding:30px;">
+                <i class="fas fa-trophy" style="font-size: 5rem; color: var(--warning); margin-bottom: 20px;"></i>
+                <h2>Kvest yakunlandi!</h2>
+                <p>Siz jami <strong>${totalScore} ball</strong> to'pladingiz.</p>
+                <div style="background: #f1f5f9; padding: 20px; border-radius: 15px; margin: 20px 0; text-align: left; font-size: 0.9rem;">
+                    <strong>Xulosa:</strong> Har doim manbani tekshiring, URL manzillariga e'tibor bering va rasmlarning asl sanasini Google orqali qidiring.
+                </div>
+                <button onclick="location.reload()" style="padding:15px 30px; border-radius:12px; border:none; background: var(--primary); color:white; cursor:pointer; font-weight:800;">Qayta urinish</button>
+            </div>
+        `;
+    }
+
+    loadCase();
+</script>
+
+</body>
+</html>
